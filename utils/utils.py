@@ -1,16 +1,20 @@
 import torch
 
 def train(net, trainloader, optimizer, loss_function, scheduler, device, epochs=50, testloader=None):
+    all_test_accuracies = []
     for epoch in range(epochs):  # loop over the dataset multiple times
-        train_loss = train_single_epoch(net, trainloader, optimizer, loss_function, device, epochs=50)
+        train_loss = train_single_epoch(net, trainloader, optimizer, loss_function, device)
         scheduler.step()
         print(f'epoch: {epoch + 1}, training loss: {train_loss}')
         if testloader is not None:
             test_accuracy = test(net, testloader, device)
+            all_test_accuracies.append(test_accuracy)
             print(f'test accuracy {test_accuracy}')
     print('Finished Training')
+    if testloader is not None:
+        print(f'Top achieved accuracy on test set is {max(all_test_accuracies)}')
 
-def train_single_epoch(net, trainloader, optimizer, loss_function, device, epochs=50):
+def train_single_epoch(net, trainloader, optimizer, loss_function, device):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs; data is a list of [inputs, labels]
